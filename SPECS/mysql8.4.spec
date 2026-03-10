@@ -2,7 +2,7 @@ ExcludeArch: %{ix86}
 
 # Name of the package without any prefixes
 %global majorname mysql
-%global package_version 8.4.7
+%global package_version 8.4.8
 %global majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
 %global pkgnamepatch mysql
 
@@ -21,7 +21,7 @@ ExcludeArch: %{ix86}
 # The last version on which the full testsuite has been run
 # In case of further rebuilds of that version, don't require full testsuite to be run
 # run only "main" suite
-%global last_tested_version 8.4.7
+%global last_tested_version 8.4.8
 # Set to 1 to force run the testsuite even if it was already tested in current version
 %global force_run_testsuite 0
 
@@ -1133,6 +1133,13 @@ popd
 %endif
 
 %changelog
+* Fri Jan 23 2026 Michal Schorm <mschorm@redhat.com> - 8.4.8-1
+- Rebase to 8.4.8
+
+* Tue Dec 09 2025 Veronika Doubkova <vdoubkov@redhat.com> - 8.4.7-2
+- Skip tests that are failing on Konflux 
+- Resolves: ROK-831
+
 * Thu Oct 30 2025 Pavol Sloboda <psloboda@redhat.com> - 8.4.7-1
 - Rebase to 8.4.7
 
