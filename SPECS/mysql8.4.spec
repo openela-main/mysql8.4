@@ -2,7 +2,7 @@ ExcludeArch: %{ix86}
 
 # Name of the package without any prefixes
 %global majorname mysql
-%global package_version 8.4.8
+%global package_version 8.4.9
 %global majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
 %global pkgnamepatch mysql
 
@@ -21,7 +21,7 @@ ExcludeArch: %{ix86}
 # The last version on which the full testsuite has been run
 # In case of further rebuilds of that version, don't require full testsuite to be run
 # run only "main" suite
-%global last_tested_version 8.4.8
+%global last_tested_version 8.4.9
 # Set to 1 to force run the testsuite even if it was already tested in current version
 %global force_run_testsuite 0
 
@@ -674,6 +674,13 @@ install -D -p -m 644 %{_vpath_builddir}/scripts/mysql@.service %{buildroot}%{_un
 install -D -p -m 0644 %{_vpath_builddir}/scripts/mysql.tmpfiles.d %{buildroot}%{_tmpfilesdir}/%{daemon_name}.conf
 rm -r %{buildroot}%{_tmpfilesdir}/mysql.conf
 
+# Create a sysusers.d config file
+# We no longer enforce the hardcoded UID/GID 27
+mkdir -p %{buildroot}%{_sysusersdir}
+cat > %{buildroot}%{_sysusersdir}/%{name}.conf << EOF
+u mysql 27 'MariaDB and MySQL Server' %{dbdatadir} -
+EOF
+
 # helper scripts for service starting
 install -D -p -m 755 %{_vpath_builddir}/scripts/mysql-prepare-db-dir %{buildroot}%{_libexecdir}/mysql-prepare-db-dir
 install -p -m 755 %{_vpath_builddir}/scripts/mysql-wait-stop %{buildroot}%{_libexecdir}/mysql-wait-stop
@@ -993,11 +1000,15 @@ popd
 %{_libexecdir}/mysql-scripts-common
 
 %{_tmpfilesdir}/%{daemon_name}.conf
+%{_sysusersdir}/%{name}.conf
+
+# Remember to also update the mysql.tmpfiles.d.in file when updating these permissions
 %attr(0755,mysql,mysql) %dir %{dbdatadir}
 %attr(0750,mysql,mysql) %dir %{_localstatedir}/lib/mysql-files
 %attr(0700,mysql,mysql) %dir %{_localstatedir}/lib/mysql-keyring
 %attr(0755,mysql,mysql) %dir %{pidfiledir}
 %attr(0750,mysql,mysql) %dir %{logfiledir}
+
 %config(noreplace) %{logrotateddir}/%{daemon_name}
 
 %if %{with devel}
@@ -1062,6 +1073,8 @@ popd
 %{_libdir}/mysql/plugin/component_test_sensitive_system_variables.so
 %{_libdir}/mysql/plugin/component_test_server_telemetry_metrics.so
 %{_libdir}/mysql/plugin/component_test_server_telemetry_traces.so
+%{_libdir}/mysql/plugin/component_test_server_telemetry_logs_client.so
+%{_libdir}/mysql/plugin/component_test_server_telemetry_logs_export.so
 %{_libdir}/mysql/plugin/component_test_status_var_reader.so
 %{_libdir}/mysql/plugin/component_test_status_var_service_int.so
 %{_libdir}/mysql/plugin/component_test_status_var_service_reg_only.so
@@ -1133,6 +1146,12 @@ popd
 %endif
 
 %changelog
+* Wed May 06 2026 Michal Schorm <mschorm@redhat.com> - 8.4.9-1
+- Rebase to 8.4.9
+
+* Tue Feb 24 2026 Lukas Javorsky <ljavorsk@redhat.com> - 8.4.8-2
+- Revert to soft static allocation of MariaDB and MySQL sysusers.d files
+
 * Fri Jan 23 2026 Michal Schorm <mschorm@redhat.com> - 8.4.8-1
 - Rebase to 8.4.8
 

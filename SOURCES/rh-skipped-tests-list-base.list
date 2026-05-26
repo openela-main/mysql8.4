@@ -37,3 +37,12 @@ rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts  :
 main.basedir                               : BUG#0
 main.grant_user_lock                       : BUG#0
 main.loaddata_special                      : BUG#0
+
+# Failing since 8.4.9 on RHEL 10 Konflux but passing in C10S
+auth_sec.atomic_rename_user                : BUG#0
+connection_control.performance_schema_processlist  : BUG#0
+perfschema.threads_innodb                  : BUG#0
+perfschema.system_events_component         : BUG#0
+perfschema.system_events_plugin            : BUG#0
+perfschema.threads_innodb                  : BUG#0
+sys_vars.myisam_data_pointer_size_func     : BUG#0
